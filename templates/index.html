@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PseudoAI — Цензура оружия</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e2a3a, #0f1724);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 2rem;
+            backdrop-filter: blur(8px);
+            padding: 2rem;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0f3fa;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .screens {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .screen {
+            flex: 1;
+            min-width: 280px;
+            background: #0f1722dd;
+            border-radius: 1.5rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid #334155;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .screen:hover {
+            transform: translateY(-5px);
+        }
+
+        .screen-header {
+            background: #1e293b;
+            padding: 0.8rem 1.2rem;
+            color: #94a3b8;
+            font-weight: bold;
+            border-bottom: 1px solid #334155;
+            text-align: center;
+        }
+
+        .drop-zone {
+            background: #0a0f1a;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px dashed #475569;
+            margin: 1rem;
+            border-radius: 1rem;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-origin: content-box;
+            position: relative;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #3b82f6;
+            background-color: #1e293b;
+            box-shadow: 0 0 0 2px #3b82f680;
+        }
+
+        .drop-zone img {
+            max-width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            border-radius: 0.75rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .placeholder-text {
+            color: #64748b;
+            text-align: center;
+        }
+
+        .right-image {
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .right-image:active {
+            transform: scale(0.98);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            background: #3b82f6;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .info-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .file-input-hidden {
+            display: none;
+        }
+
+        .download-hint {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔫 PseudoAI · Блюр оружия</h1>
+    <div class="screens">
+        <!-- Левый экран: загрузка -->
+        <div class="screen">
+            <div class="screen-header">📸 Оригинал (перетащи PNG)</div>
+            <div id="leftDropZone" class="drop-zone">
+                <div class="placeholder-icon">🖼️📎</div>
+                <div class="placeholder-text">Перетащите PNG файл<br>или нажмите для выбора</div>
+                <input type="file" id="fileInput" accept="image/png" class="file-input-hidden">
+            </div>
+        </div>
+
+        <!-- Правый экран: результат -->
+        <div class="screen">
+            <div class="screen-header">🤖 PseudoCensorship.png</div>
+            <div id="rightZone" class="drop-zone" style="cursor: pointer;">
+                <div class="placeholder-icon">✨🔞</div>
+                <div class="placeholder-text">Результат появится после обработки</div>
+                <div class="download-hint">👇 Нажми на картинку, чтобы скачать</div>
+            </div>
+        </div>
+    </div>
+    <div class="controls">
+        <button id="refreshBtn">🔄 Обновить / Обработать</button>
+    </div>
+    <div class="info-text">
+        ⚠️ Только PNG | После нажатия «Обновить» фото сохранится в папку PseudoAI,<br>
+        а справа покажется PseudoCensorship.png
+    </div>
+</div>
+
+<script>
+    const leftZone = document.getElementById('leftDropZone');
+    const rightZone = document.getElementById('rightZone');
+    const fileInput = document.getElementById('fileInput');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    let currentUploadedFile = null;
+    let currentResultUrl = null;
+
+    async function uploadFile(file) {
+        if (!file.type.match('image/png')) {
+            alert('Ошибка: можно загружать только PNG файлы!');
+            return false;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.error || 'Ошибка загрузки');
+                return false;
+            }
+
+            const previewUrl = data.preview_url;
+            currentUploadedFile = previewUrl;
+            displayImageInLeft(previewUrl);
+            currentResultUrl = data.result_url;
+            clearRightZone();
+
+            return true;
+        } catch (err) {
+            console.error(err);
+            alert('Сетевая ошибка: ' + err.message);
+            return false;
+        }
+    }
+
+    function displayImageInLeft(imageUrl) {
+        leftZone.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Загруженное фото';
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '350px';
+        img.style.borderRadius = '0.75rem';
+        leftZone.appendChild(img);
+        leftZone.style.cursor = 'pointer';
+    }
+
+    function clearRightZone() {
+        rightZone.innerHTML = '';
+        const placeholderDiv = document.createElement('div');
+        placeholderDiv.style.textAlign = 'center';
+        placeholderDiv.innerHTML = `
+            <div class="placeholder-icon">✨🔞</div>
+            <div class="placeholder-text">Нажмите «Обновить» для обработки</div>
+            <div class="download-hint">👇 Результат появится после нажатия</div>
+        `;
+        rightZone.appendChild(placeholderDiv);
+        rightZone.style.cursor = 'default';
+        rightZone.onclick = null;
+    }
+
+    function displayResultInRight(imageUrl) {
+        rightZone.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = imageUrl + '?t=' + new Date().getTime();
+        img.alt = 'PseudoCensorship';
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '350px';
+        img.style.borderRadius = '0.75rem';
+        img.classList.add('right-image');
+        rightZone.appendChild(img);
+        rightZone.style.cursor = 'pointer';
+
+        rightZone.onclick = () => {
+            if (currentResultUrl) {
+                const link = document.createElement('a');
+                link.href = currentResultUrl;
+                link.download = 'PseudoCensorship.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                alert('Нет доступного результата');
+            }
+        };
+    }
+
+    async function handleRefresh() {
+        if (!currentUploadedFile) {
+            alert('Сначала загрузите фото слева (перетащите или нажмите на левый экран)');
+            return;
+        }
+
+        try {
+            const response = await fetch('/process', { method: 'POST' });
+            const data = await response.json();
+
+            if (response.ok) {
+                currentResultUrl = data.result_url;
+                displayResultInRight(currentResultUrl);
+            } else {
+                alert('Ошибка обработки: ' + (data.error || 'неизвестная ошибка'));
+            }
+        } catch (e) {
+            alert('Ошибка связи: ' + e.message);
+        }
+    }
+
+    // Drag & Drop
+    leftZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        leftZone.classList.add('drag-over');
+    });
+    leftZone.addEventListener('dragleave', () => {
+        leftZone.classList.remove('drag-over');
+    });
+    leftZone.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        leftZone.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            await uploadFile(files[0]);
+        }
+    });
+
+    leftZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+        if (e.target.files.length > 0) {
+            await uploadFile(e.target.files[0]);
+            fileInput.value = '';
+        }
+    });
+
+    refreshBtn.addEventListener('click', handleRefresh);
+    clearRightZone();
+</script>
+</body>
+</html>
