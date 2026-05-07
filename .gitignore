@@ -1,0 +1,54 @@
+.idea/
+__pycache__/
+torch-2.10.0+cpu-cp313-cp313-win_arm64.whl
+torchvision-0.22.0+cpu-cp313-cp313-win_amd64.whl
+weapon-censor/__pycache__/
+weapon-censor/result.jpg
+weapon-censor/test_image.jpg
+
+# Изображения
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+
+# Тестовые и временные файлы
+ml_learning.py
+simple_censor.py
+result.jpg
+test_image.jpg
+
+# Модели (большие файлы)
+*.pt
+*.pth
+*.weights
+*.onnx
+*.tflite
+
+# Python
+*.py[cod]
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+*.swp
+
+# Данные
+data/
+dataset/
+runs/
+
+# Логи
+logs/
+*.log
+
+# Статические файлы (если генерируются)
+static/uploads/*
+static/processed/*
+!static/uploads/.gitkeep
+!static/processed/.gitkeep

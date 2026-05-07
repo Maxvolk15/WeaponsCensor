@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weapon Censor - Цензурирование оружия</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Weapon Censor</h1>
+        <p class="subtitle">Загрузите фото — оружие будет автоматически найдено и скрыто</p>
+
+        <div class="main-content">
+            <div class="image-panel">
+                <div class="panel-title">
+                    Исходное изображение
+                </div>
+                <div class="drop-zone" id="inputDropZone">
+                    <div class="drop-zone-text">
+                        <p class="upload-icon">📁</p>
+                        <p>Перетащите изображение сюда</p>
+                        <p class="upload-hint">или кликните для выбора</p>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+            </div>
+
+            <div class="image-panel">
+                <div class="panel-title">
+                    Результат обработки
+                </div>
+                <div class="drop-zone" id="outputZone">
+                    <div class="drop-zone-text">
+                        <p class="upload-icon">🔍</p>
+                        <p>Здесь появится результат</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Панель управления -->
+        <div class="controls">
+            <div class="controls-title">Настройки цензурирования</div>
+
+            <div class="control-row">
+                <!-- Выбор метода -->
+                <div class="control-group">
+                    <label for="censorMethod">🔧 Способ цензуры:</label>
+                    <select id="censorMethod">
+                        <option value="blur">🌫️ Размытие (Gaussian Blur)</option>
+                        <option value="pixelate">🔲 Пикселизация</option>
+                        <option value="black">⬛ Чёрный прямоугольник</option>
+                    </select>
+                </div>
+
+                <!-- Сила размытия -->
+                <div class="control-group" id="blurStrengthGroup">
+                    <label for="blurStrength">
+                        Сила размытия: <span class="slider-value" id="blurValue">51</span>
+                    </label>
+                    <input type="range" id="blurStrength" min="11" max="101" step="2" value="51">
+                </div>
+
+                <!-- Размер пикселя -->
+                <div class="control-group" id="pixelSizeGroup">
+                    <label for="pixelSize">
+                        Размер пикселя: <span class="slider-value" id="pixelValue">15</span>
+                    </label>
+                    <input type="range" id="pixelSize" min="5" max="40" step="1" value="15">
+                </div>
+
+                <!-- Кнопка -->
+                <div class="control-group btn-group">
+                    <button class="btn" id="processBtn" disabled>
+                        Обработать
+                    </button>
+                </div>
+            </div>
+
+            <!-- Индикатор загрузки -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p class="loading-text">Идёт анализ изображения...</p>
+            </div>
+
+            <!-- Информация о результате -->
+            <div class="result-info" id="resultInfo">
+                <strong>Найдено оружия:</strong> <span id="weaponsCount">0</span>
+                <div id="weaponsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
