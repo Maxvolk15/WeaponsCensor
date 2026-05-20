@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.git
+.gitignore
+.env
+venv/
+env/
+README.md
+*.md
+.cache/
+weapon-censor/static/uploads/*
+weapon-censor/static/processed/*
